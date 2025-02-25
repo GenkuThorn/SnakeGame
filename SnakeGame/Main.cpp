@@ -5,8 +5,10 @@
 #include <conio.h>
 
 #define SIZEX 20
-#define STARTSIZE 4
+#define STARTSIZE 3
 using namespace std;
+
+void set_cursor(int, int);
 
 int main()
 {
@@ -55,7 +57,7 @@ int main()
 		}
 
 		//update snake
-		board[snake.front() / SIZEX][snake.front() % SIZEX] = 'b';
+		//board[snake.front() / SIZEX][snake.front() % SIZEX] = 'b';
 		// check for wall collision and advance snake
 		switch (direction) 
 		{
@@ -100,6 +102,7 @@ int main()
 
 		if (isAlive)
 		{
+			board[*++snake.begin() / SIZEX][*++snake.begin() % SIZEX] = 'b';
 			board[snake.back() / SIZEX][snake.back() % SIZEX] = ' ';
 			board[snake.front() / SIZEX][snake.front() % SIZEX] = 'v';
 			snake.pop_back();
@@ -115,6 +118,7 @@ int main()
 		}
 
 		// print board
+		set_cursor(0,0);
 		for (int i = 0; i < SIZEX + 2; i++)
 			cout << "x ";
 		cout << endl;
@@ -136,4 +140,14 @@ int main()
 
 	// end of program
 	return 0;
+}
+
+void set_cursor(int x = 0, int y = 0)
+{
+	HANDLE handle;
+	COORD coordinates;
+	handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	coordinates.X = x;
+	coordinates.Y = y;
+	SetConsoleCursorPosition(handle, coordinates);
 }
