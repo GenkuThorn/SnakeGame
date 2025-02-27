@@ -70,6 +70,7 @@ int main()
 	board[portalX / SIZEX][portalX % SIZEX] = 'O';
 	board[portalY / SIZEX][portalY % SIZEX] = 'O';
 	//game start
+
 	while (isAlive)
 	{
 		Sleep(100);
@@ -160,7 +161,7 @@ int main()
 			break;
 
 		case 's':
-			if (snake.front() + SIZEX >= SIZEX * SIZEX - 1)
+			if (snake.front() + SIZEX >= SIZEX * SIZEX)
 			{
 				isAlive = false;
 				break;
