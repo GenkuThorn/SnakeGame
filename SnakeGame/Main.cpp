@@ -14,9 +14,6 @@ int findRandomEmptySpace(char** board);
 
 int main()
 {
-
-
-
 	//	create board
 	char* board[SIZEX];
 	for (int i = 0; i < SIZEX; i++)
@@ -70,10 +67,10 @@ int main()
 	board[portalX / SIZEX][portalX % SIZEX] = 'O';
 	board[portalY / SIZEX][portalY % SIZEX] = 'O';
 	//game start
-
 	while (isAlive)
 	{
-		Sleep(100);
+		// 10 steps per second
+		Sleep(1000 / 10);
 
 		// check for player input
 		while (_kbhit()) 
@@ -118,7 +115,6 @@ int main()
 				break;
 		}
 
-		//update snake
 		//check for wall collision
 		switch (direction) 
 		{
@@ -200,6 +196,7 @@ int main()
 		}
 		if (snake.front() > SIZEX * SIZEX - 1 || snake.front() < 0)
 			throw ("out of bounds");
+
 		//advance snake
 		if (isAlive)
 		{	
@@ -223,9 +220,9 @@ int main()
 			case 's':
 				board[snake.front() / SIZEX][snake.front() % SIZEX] = 'v';
 				break;
-			}
-			
+			}			
 		}
+
 		//check for collision with self
 		for (iter = ++snake.begin(); iter != snake.end(); iter++)
 		{
@@ -264,7 +261,6 @@ int main()
 	}
 
 	cout << endl << "Game Over: " << score << endl;
-
 	// end of program
 	return 0;
 }
@@ -291,3 +287,5 @@ int findRandomEmptySpace(char** board)
 	}
 	return var;
 }
+
+//end of file
