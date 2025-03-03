@@ -42,6 +42,7 @@ int main()
 	list<int>::iterator iter;
 	int score = 0;
 	srand(time(0));
+	bool isPaused = false;
 
 	//apple generation
 	int apple = findRandomEmptySpace(board);
@@ -54,7 +55,7 @@ int main()
 	{
 		portalX = findRandomEmptySpace(board);
 		portalY = findRandomEmptySpace(board);
-		if (portalX % SIZEX != 0 &&
+		if (portalX % SIZEX != 0 &&			// no portal at wall allowed
 			portalX % SIZEX != SIZEX - 1 &&
 			portalX / SIZEX != 0 &&
 			portalX / SIZEX != SIZEX - 1 &&
@@ -66,6 +67,7 @@ int main()
 	}
 	board[portalX / SIZEX][portalX % SIZEX] = 'O';
 	board[portalY / SIZEX][portalY % SIZEX] = 'O';
+
 	//game start
 	while (isAlive)
 	{
@@ -110,9 +112,20 @@ int main()
 				isAlive = false;
 				isDone = true;
 				break;
-			}
+			case 'p':
+				isPaused = true;
+				isDone = true;
+				break;
+			}			
 			if (isDone)
 				break;
+		}
+
+		// game pause
+		while (isPaused)
+		{
+			if (_getch() == 'p')
+				isPaused = false;
 		}
 
 		//check for wall collision
@@ -261,6 +274,9 @@ int main()
 	}
 
 	cout << endl << "Game Over: " << score << endl;
+
+	Sleep(1000);
+
 	// end of program
 	return 0;
 }
