@@ -4,69 +4,69 @@
 #include <windows.h>
 #include <conio.h>
 
+#include "Coordinate.h"
+
 #define SIZEX 20
-#define SIZEY 20 //not currently used
+#define SIZEY 15
 #define STARTSIZE 3
 using namespace std;
 
 void set_cursor(int, int);
-int findRandomEmptySpace(char** board);
+Coordinate findRandomEmptySpace(char** board);
 
 int main()
 {
 	//	create board
-	char* board[SIZEX];
-	for (int i = 0; i < SIZEX; i++)
+	char* board[SIZEY];
+	for (int i = 0; i < SIZEY; i++)
 	{
 		board[i] = new char[SIZEX];
 		for (int j = 0; j < SIZEX; j++)
 		{
 			board[i][j] = ' ';
 		}
-	}
+	}	
 
 	//	create snake
-	//	x is 0 to SIZE-1
-	//	y is SIZE * (0 to SIZE-1)
-	list<int> snake;
-	snake.push_front(3 + SIZEX / 2 * SIZEX);
+	list<Coordinate> snake;
+	snake.push_front(Coordinate(SIZEY / 2, 3));
 	for (int i = 0; i < STARTSIZE; i++)
 	{
-		board[snake.front() / SIZEX][snake.front() % SIZEX] = '=';
-		snake.push_front(snake.front() + 1);
+		board[snake.front().getY()][snake.front().getX()] = '=';
+		snake.push_front(Coordinate(snake.front().getY() , snake.front().getX() + 1));
 	}
-	board[snake.front() / SIZEX][snake.front() % SIZEX] = '>';
+	board[snake.front().getY()][snake.front().getX()] = '>';
 
 	char direction = 'd'; // d = east	a = west	w = north	s = south
 	bool isAlive = true;
-	list<int>::iterator iter;
+	list<Coordinate>::iterator iter;
 	int score = 0;
 	srand(time(0));
 	bool isPaused = false;
 
 	//apple generation
-	int apple = findRandomEmptySpace(board);
-	board[apple / SIZEX][apple % SIZEX] = 'a';
+	Coordinate apple = findRandomEmptySpace(board);
+	board[apple.getY()][apple.getX()] = 'a';
 
 	// portal generation
-	int portalX, portalY;
+	Coordinate portalA, portalB;
 	bool genDone = false;
 	while (!genDone)
 	{
-		portalX = findRandomEmptySpace(board);
-		portalY = findRandomEmptySpace(board);
-		if (portalX % SIZEX != 0 &&			// no portal at wall allowed
-			portalX % SIZEX != SIZEX - 1 &&
-			portalX / SIZEX != 0 &&
-			portalX / SIZEX != SIZEX - 1 &&
-			portalY % SIZEX != 0 &&
-			portalY % SIZEX != SIZEX - 1 &&
-			portalY / SIZEX != 0 &&
-			portalY / SIZEX != SIZEX - 1)
+		portalA = findRandomEmptySpace(board);
+		portalB = findRandomEmptySpace(board);
+		if (portalA.getX() != 0 &&			// no portal at wall allowed
+			portalA.getX() != SIZEX - 1 &&
+			portalA.getY() != 0 &&
+			portalA.getY() != SIZEX - 1 &&
+			portalB.getX() != 0 &&
+			portalB.getX() != SIZEX - 1 &&
+			portalB.getY() != 0 &&
+			portalB.getY() != SIZEX - 1)
 			genDone = true;
 	}
-	board[portalX / SIZEX][portalX % SIZEX] = 'O';
-	board[portalY / SIZEX][portalY % SIZEX] = 'O';
+	board[portalA.getY()][portalA.getX()] = 'O';
+	board[portalB.getY()][portalB.getX()] = 'O';
 
 	//game start
 	while (isAlive)
@@ -132,82 +132,91 @@ int main()
 		switch (direction) 
 		{
 		case 'd':
-			if (snake.front() % SIZEX + 1  == SIZEX)
+			if (snake.front().getX() + 1 == SIZEX)
 			{
 				isAlive = false;
 				break;
 			}
-			if (snake.front() + 1 == portalY)
+			if (snake.front().getY() == portalB.getY() &&
+				snake.front().getX() + 1 == portalB.getX())
 			{
-				snake.push_front(portalX + 1);
+				snake.push_front(Coordinate(portalA.getY(), portalA.getX() + 1));
 				break;
 			}
-			if (snake.front() + 1 == portalX)
+			if (snake.front().getY() == portalA.getY() &&
+				snake.front().getX() + 1 == portalA.getX())
 			{
-				snake.push_front(portalY + 1);
+				snake.push_front(Coordinate(portalB.getY(), portalB.getX() + 1));
 				break;
 			}
-				snake.push_front(snake.front() + 1);
+			snake.push_front(Coordinate(snake.front().getY(), snake.front().getX() + 1));
 			break;
 
 		case 'a':
-			if (snake.front() % SIZEX - 1 == -1)
+			if (snake.front().getX() - 1 == -1)
 			{
 				isAlive = false;
 				break;
 			}
-			if (snake.front() - 1 == portalY)
+			if (snake.front().getY() == portalB.getY() &&
+				snake.front().getX() - 1 == portalB.getX())
 			{
-				snake.push_front(portalX - 1);
+				snake.push_front(Coordinate(portalA.getY(), portalA.getX() - 1));
 				break;
 			}
-			if (snake.front() - 1 == portalX)
+			if (snake.front().getY() == portalA.getY() &&
+				snake.front().getX() - 1 == portalA.getX())
 			{
-				snake.push_front(portalY - 1);
+				snake.push_front(Coordinate(portalB.getY(), portalB.getX() - 1));
 				break;
 			}
-			snake.push_front(snake.front() - 1);
+			snake.push_front(Coordinate(snake.front().getY(), snake.front().getX() - 1));
 			break;
 
 		case 's':
-			if (snake.front() + SIZEX >= SIZEX * SIZEX)
+			if (snake.front().getY() + 1 == SIZEY)
 			{
 				isAlive = false;
 				break;
 			}
-			if (snake.front() + SIZEX == portalY)
+			if (snake.front().getY() + 1== portalB.getY() &&
+				snake.front().getX() == portalB.getX())
 			{
-				snake.push_front(portalX + SIZEX);
+				snake.push_front(Coordinate(portalA.getY() + 1, portalA.getX()));
 				break;
 			}
-			if (snake.front() + SIZEX == portalX)
+			if (snake.front().getY() + 1 == portalA.getY() &&
+				snake.front().getX() == portalA.getX())
 			{
-				snake.push_front(portalY + SIZEX);
+				snake.push_front(Coordinate(portalB.getY() + 1, portalB.getX()));
 				break;
 			}
-			snake.push_front(snake.front() + SIZEX);
+			snake.push_front(Coordinate(snake.front().getY() + 1, snake.front().getX()));
 			break;
 
 		case 'w':
-			if (snake.front() - SIZEX <= -1)
+			if (snake.front().getY() - 1 == -1)
 			{
 				isAlive = false;
 				break;
 			}
-			if (snake.front() - SIZEX == portalY)
+			if (snake.front().getY() - 1 == portalB.getY() &&
+				snake.front().getX() == portalB.getX())
 			{
-				snake.push_front(portalX - SIZEX);
+				snake.push_front(Coordinate(portalA.getY() - 1, portalA.getX()));
 				break;
 			}
-			if (snake.front() - SIZEX == portalX)
+			if (snake.front().getY() - 1 == portalA.getY() &&
+				snake.front().getX() == portalA.getX())
 			{
-				snake.push_front(portalY - SIZEX);
+				snake.push_front(Coordinate(portalB.getY() - 1, portalB.getX()));
 				break;
 			}
-			snake.push_front(snake.front() - SIZEX);
+			snake.push_front(Coordinate(snake.front().getY() - 1, snake.front().getX()));
 			break;
 		}
-		if (snake.front() > SIZEX * SIZEX - 1 || snake.front() < 0)
+		if (snake.front().getY() > SIZEY - 1 || snake.front().getY() < 0 ||
+			snake.front().getX() > SIZEX - 1 || snake.front().getX() < 0)
 			throw ("out of bounds");
 
 		//advance snake
@@ -215,23 +224,23 @@ int main()
 		{	
 			if (snake.front() != apple)
 			{
-				board[snake.back() / SIZEX][snake.back() % SIZEX] = ' ';
+				board[snake.back().getY()][snake.back().getX()] = ' ';
 				snake.pop_back();
 			}
-			board[*++snake.begin() / SIZEX][*++snake.begin() % SIZEX] = '=';
+			board[(++snake.begin())->getY()][(++snake.begin())->getX()] = '=';
 			switch (direction)
 			{
 			case 'a':
-				board[snake.front() / SIZEX][snake.front() % SIZEX] = '<';
+				board[snake.front().getY()][snake.front().getX()] = '<';
 				break;
 			case 'd':
-				board[snake.front() / SIZEX][snake.front() % SIZEX] = '>';
+				board[snake.front().getY()][snake.front().getX()] = '>';
 				break;
 			case 'w':
-				board[snake.front() / SIZEX][snake.front() % SIZEX] = '^';
+				board[snake.front().getY()][snake.front().getX()] = '^';
 				break;
 			case 's':
-				board[snake.front() / SIZEX][snake.front() % SIZEX] = 'v';
+				board[snake.front().getY()][snake.front().getX()] = 'v';
 				break;
 			}			
 		}
@@ -252,14 +261,14 @@ int main()
 			score++;
 			apple = findRandomEmptySpace(board);
 		}
-		board[apple / SIZEX][apple % SIZEX] = 'a';
+		board[apple.getY()][apple.getX()] = 'a';
 
 		// print board
 		set_cursor(0,0);
 		for (int i = 0; i < SIZEX + 2; i++)
 			cout << "x ";
 		cout << endl;
-		for (int i = 0; i < SIZEX; i++)
+		for (int i = 0; i < SIZEY; i++)
 		{
 			cout << "x ";
 			for (int j = 0; j < SIZEX; j++)
@@ -291,14 +300,15 @@ void set_cursor(int x = 0, int y = 0)
 	SetConsoleCursorPosition(handle, coordinates);
 }
 
-int findRandomEmptySpace(char** board)
+Coordinate findRandomEmptySpace(char** board)
 {
-	int var;
+	Coordinate var;
 	bool valid = false;
 	while (!valid)
 	{
-		var = rand() % (SIZEX * SIZEX);
-		if (board[var / SIZEX][var % SIZEX] == ' ')
+		var.setX(rand() % SIZEX);
+		var.setY(rand() % SIZEY);
+		if (board[var.getY()][var.getX()] == ' ')
 			valid = true;
 	}
 	return var;
