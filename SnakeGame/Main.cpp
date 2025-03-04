@@ -286,6 +286,10 @@ int main()
 
 	Sleep(1000);
 
+	for (int i = 0; i < SIZEY; i++)
+	{
+		delete board[i];
+	}
 	// end of program
 	return 0;
 }
