@@ -29,7 +29,7 @@ int main()
 
 	//	create snake
 	list<Coordinate> snake;
-	snake.push_front(Coordinate(SIZEY / 2, 3));
+	snake.push_front(Coordinate(SIZEY / 2, 1));
 	for (int i = 0; i < STARTSIZE; i++)
 	{
 		board[snake.front().getY()][snake.front().getX()] = '=';
@@ -58,11 +58,11 @@ int main()
 		if (portalA.getX() != 0 &&			// no portal at wall allowed
 			portalA.getX() != SIZEX - 1 &&
 			portalA.getY() != 0 &&
-			portalA.getY() != SIZEX - 1 &&
+			portalA.getY() != SIZEY - 1 &&
 			portalB.getX() != 0 &&
 			portalB.getX() != SIZEX - 1 &&
 			portalB.getY() != 0 &&
-			portalB.getY() != SIZEX - 1)
+			portalB.getY() != SIZEY - 1)
 			genDone = true;
 	}
 	board[portalA.getY()][portalA.getX()] = 'O';
@@ -283,8 +283,10 @@ int main()
 	}
 
 	cout << endl << "Game Over: " << score << endl;
-
-	Sleep(1000);
+	cout << endl << "press q to exit" << endl;
+	
+	while (_getch() != 'q')
+	{ }
 
 	for (int i = 0; i < SIZEY; i++)
 	{
