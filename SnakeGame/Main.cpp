@@ -290,7 +290,7 @@ int main()
 
 	for (int i = 0; i < SIZEY; i++)
 	{
-		delete board[i];
+		delete[] board[i];
 	}
 	// end of program
 	return 0;
